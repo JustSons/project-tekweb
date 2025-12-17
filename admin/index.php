@@ -10,6 +10,16 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] != 'admin') {
     die("Akses ditolak: Anda bukan Admin.");
 }
 
+// Tangani pesan dari session
+$message = "";
+$status_type = "";
+if (isset($_SESSION['message'])) {
+    $message = $_SESSION['message'];
+    $status_type = $_SESSION['message_type'];
+    unset($_SESSION['message']);
+    unset($_SESSION['message_type']);
+}
+
 // --- LOGIKA TAMBAHAN UNTUK STATISTIK DASHBOARD ---
 // 1. Hitung Total Produk
 $q_items = mysqli_query($conn, "SELECT COUNT(*) as total FROM items");
@@ -58,6 +68,19 @@ $total_revenue = $row_revenue['total'] ?? 0;
                 </div>
             </div>
         </nav>
+
+        <?php if ($message): ?>
+            <div class="container mx-auto px-6 py-4">
+                <div class="<?php echo ($status_type == 'success') ? 'bg-green-50 text-green-700 border-green-200' : 'bg-red-50 text-red-700 border-red-200'; ?> border p-4 rounded-lg mb-6 flex items-center shadow-sm">
+                    <?php if($status_type == 'success'): ?>
+                        <i class="fa-solid fa-circle-check mr-2 text-xl"></i>
+                    <?php else: ?>
+                        <i class="fa-solid fa-circle-exclamation mr-2 text-xl"></i>
+                    <?php endif; ?>
+                    <?= $message ?>
+                </div>
+            </div>
+        <?php endif; ?>
 
         <div class="container mx-auto px-6 py-8 flex-1">
             
@@ -108,6 +131,7 @@ $total_revenue = $row_revenue['total'] ?? 0;
                                 <th class="p-4 border-b">Harga</th>
                                 <th class="p-4 border-b">Deskripsi</th>
                                 <th class="p-4 border-b text-center">ID</th>
+                                <th class="p-4 border-b text-center">Aksi</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-100">
@@ -125,6 +149,20 @@ $total_revenue = $row_revenue['total'] ?? 0;
                                 <td class="p-4 text-indigo-600 font-bold">Rp <?= number_format($item['harga']) ?></td>
                                 <td class="p-4 text-gray-500 text-sm max-w-xs truncate"><?= htmlspecialchars($item['deskripsi']) ?></td>
                                 <td class="p-4 text-center text-gray-400 text-xs">#<?= $item['id'] ?></td>
+                                <td class="p-4 text-center">
+                                    <div class="flex items-center justify-center gap-2">
+                                        <a href="edit_item.php?id=<?= $item['id'] ?>" 
+                                           class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-600 hover:bg-blue-600 hover:text-white transition"
+                                           title="Edit Item">
+                                            <i class="fa-solid fa-edit"></i>
+                                        </a>
+                                        <a href="delete_item.php?id=<?= $item['id'] ?>" 
+                                           class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-red-100 text-red-600 hover:bg-red-600 hover:text-white transition"
+                                           onclick="return confirm('Yakin ingin menghapus item ini secara permanen?')" title="Hapus Item">
+                                            <i class="fa-solid fa-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
                             </tr>
                             <?php } ?>
                         </tbody>
@@ -193,11 +231,11 @@ $total_revenue = $row_revenue['total'] ?? 0;
                                     </form>
                                 </td>
                                 <td class="p-4 text-center">
-                                    <a href="delete_order.php?id=<?= $b['id'] ?>" 
+                                    <button onclick="openDeleteModal(<?= $b['id'] ?>, '<?= htmlspecialchars($b['nama_item']) ?>')" 
                                        class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-red-100 text-red-600 hover:bg-red-600 hover:text-white transition"
-                                       onclick="return confirm('Yakin ingin menghapus order ini secara permanen?')" title="Hapus Order">
+                                       title="Hapus Order">
                                         <i class="fa-solid fa-trash"></i>
-                                    </a>
+                                    </button>
                                 </td>
                             </tr>
                             <?php } ?>
@@ -208,6 +246,62 @@ $total_revenue = $row_revenue['total'] ?? 0;
 
         </div>
     </div>
+
+    <!-- Modal Konfirmasi Hapus -->
+    <div id="deleteModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+            <div class="mt-3 text-center">
+                <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100">
+                    <i class="fa-solid fa-exclamation-triangle text-red-600 text-xl"></i>
+                </div>
+                <h3 class="text-lg leading-6 font-medium text-gray-900 mt-4">Konfirmasi Hapus</h3>
+                <div class="mt-2 px-7 py-3">
+                    <p class="text-sm text-gray-500">
+                        Apakah Anda yakin ingin menghapus pesanan <strong id="deleteItemName"></strong> secara permanen? 
+                        Tindakan ini tidak dapat dibatalkan.
+                    </p>
+                </div>
+                <div class="flex items-center px-4 py-3">
+                    <button id="cancelDelete" class="px-4 py-2 bg-gray-300 text-gray-900 text-base font-medium rounded-md w-full shadow-sm hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 mr-3">
+                        Batal
+                    </button>
+                    <button id="confirmDelete" class="px-4 py-2 bg-red-600 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-300">
+                        Hapus
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let deleteOrderId = null;
+
+        function openDeleteModal(id, itemName) {
+            deleteOrderId = id;
+            document.getElementById('deleteItemName').textContent = itemName;
+            document.getElementById('deleteModal').classList.remove('hidden');
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').classList.add('hidden');
+            deleteOrderId = null;
+        }
+
+        document.getElementById('cancelDelete').addEventListener('click', closeDeleteModal);
+
+        document.getElementById('confirmDelete').addEventListener('click', function() {
+            if (deleteOrderId) {
+                window.location.href = 'delete_order.php?id=' + deleteOrderId;
+            }
+        });
+
+        // Tutup modal jika klik di luar modal
+        document.getElementById('deleteModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeDeleteModal();
+            }
+        });
+    </script>
 
 </body>
 </html>

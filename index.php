@@ -1,12 +1,13 @@
-<?php 
+<?php
 // Pastikan session dimulai (jika di db.php belum ada session_start)
 // if (session_status() == PHP_SESSION_NONE) {
 //     session_start();
 // }
-include "config/db.php"; 
+include "config/db.php";
 ?>
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -16,16 +17,31 @@ include "config/db.php";
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { font-family: 'Poppins', sans-serif; }
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+
         /* Animasi halus untuk tombol cart */
         @keyframes float {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
-            100% { transform: translateY(0px); }
+            0% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+
+            100% {
+                transform: translateY(0px);
+            }
         }
-        .float-anim { animation: float 3s ease-in-out infinite; }
+
+        .float-anim {
+            animation: float 3s ease-in-out infinite;
+        }
     </style>
 </head>
+
 <body class="bg-gray-50 text-gray-800">
 
     <nav class="bg-white/90 backdrop-blur-md border-b border-gray-200 sticky top-0 z-50 transition-all duration-300">
@@ -36,9 +52,9 @@ include "config/db.php";
                 </div>
                 <span class="text-xl font-bold tracking-tight text-gray-900">Guitar Shop</span>
             </a>
-            
+
             <div class="flex items-center gap-4 md:gap-6">
-                <?php if(isset($_SESSION['user'])) { ?>
+                <?php if (isset($_SESSION['user'])) { ?>
                     <span class="hidden md:block text-gray-600 font-medium text-sm">
                         Halo, <span class="text-indigo-600 font-bold"><?= htmlspecialchars($_SESSION['user']['nama']) ?></span>
                     </span>
@@ -85,7 +101,7 @@ include "config/db.php";
             while ($item = mysqli_fetch_assoc($q)) {
             ?>
                 <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-xl transition duration-300 flex flex-col group">
-                    
+
                     <div class="relative h-64 overflow-hidden bg-gray-100">
                         <img src="<?= htmlspecialchars($item['gambar']) ?>" class="w-full h-full object-cover transition duration-700 group-hover:scale-110">
                         <div class="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition duration-300"></div>
@@ -95,7 +111,22 @@ include "config/db.php";
                         <h3 class="text-lg font-bold text-gray-900 mb-2 line-clamp-1">
                             <?= htmlspecialchars($item['nama_item']) ?>
                         </h3>
-                        
+
+                        <p id="desc-<?= $item['id'] ?>" class="text-sm text-gray-500 mb-1 line-clamp-1 transition-all duration-300 text-left">
+                            <?= htmlspecialchars($item['deskripsi']) ?>
+                        </p>
+
+                        <?php if (strlen($item['deskripsi']) > 60): ?>
+                            <div class="text-left"> <button onclick="toggleReadMore(<?= $item['id'] ?>)"
+                                    id="btn-<?= $item['id'] ?>"
+                                    class="text-xs font-bold text-indigo-600 hover:text-indigo-800 mb-4 focus:outline-none hover:underline">
+                                    Baca selengkapnya
+                                </button>
+                            </div>
+                        <?php else: ?>
+                            <div class="mb-4"></div>
+                        <?php endif; ?>
+
                         <div class="flex justify-between items-center mb-6">
                             <p class="text-2xl font-bold text-indigo-600">
                                 Rp <?= number_format($item['harga'], 0, ',', '.') ?>
@@ -105,23 +136,25 @@ include "config/db.php";
                         <div class="mt-auto">
                             <?php if (!isset($_SESSION['user'])) { ?>
                                 <a href="auth/login.php"
-                                   class="block w-full text-center bg-gray-100 text-gray-800 font-bold py-3 rounded-xl hover:bg-gray-200 transition">
-                                   Login untuk Membeli
+                                    class="block w-full text-center bg-gray-100 text-gray-800 font-bold py-3 rounded-xl hover:bg-gray-200 transition">
+                                    Login untuk Membeli
                                 </a>
                             <?php } else { ?>
                                 <div class="flex items-center justify-between bg-gray-50 rounded-xl p-1 mb-3 border border-gray-200">
-                                    <button class="minus w-10 h-10 flex items-center justify-center bg-white text-gray-600 rounded-lg shadow-sm hover:text-indigo-600 font-bold text-lg transition" 
-                                            data-id="<?= $item['id'] ?>">−</button>
-                                    
+                                    <button class="minus w-10 h-10 flex items-center justify-center bg-white text-gray-600 rounded-lg shadow-sm hover:text-indigo-600 font-bold text-lg transition"
+                                        data-id="<?= $item['id'] ?>">−</button>
+
                                     <span id="qty<?= $item['id'] ?>" class="font-bold text-gray-800 text-lg w-12 text-center">1</span>
-                                    
-                                    <button class="plus w-10 h-10 flex items-center justify-center bg-white text-gray-600 rounded-lg shadow-sm hover:text-indigo-600 font-bold text-lg transition" 
-                                            data-id="<?= $item['id'] ?>">+</button>
+
+                                    <button class="plus w-10 h-10 flex items-center justify-center bg-white text-gray-600 rounded-lg shadow-sm hover:text-indigo-600 font-bold text-lg transition"
+                                        data-id="<?= $item['id'] ?>">+</button>
                                 </div>
 
                                 <button data-id="<?= $item['id'] ?>"
-                                        class="buy w-full bg-gray-900 text-white font-bold py-3 rounded-xl hover:bg-indigo-600 transition shadow-lg hover:shadow-indigo-500/30 flex items-center justify-center gap-2">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+                                    class="buy w-full bg-gray-900 text-white font-bold py-3 rounded-xl hover:bg-indigo-600 transition shadow-lg hover:shadow-indigo-500/30 flex items-center justify-center gap-2">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+                                    </svg>
                                     Masukkan Keranjang
                                 </button>
                             <?php } ?>
@@ -133,10 +166,12 @@ include "config/db.php";
     </div>
 
     <a href="cart.php"
-       class="float-anim fixed bottom-8 right-8 bg-indigo-600 text-white w-16 h-16 rounded-full shadow-2xl flex items-center justify-center hover:bg-indigo-700 transition z-50 group border-4 border-white">
-        <svg class="w-8 h-8 group-hover:scale-110 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-        
-        <?php if(isset($_SESSION['cart']) && count($_SESSION['cart']) > 0): ?>
+        class="float-anim fixed bottom-8 right-8 bg-indigo-600 text-white w-16 h-16 rounded-full shadow-2xl flex items-center justify-center hover:bg-indigo-700 transition z-50 group border-4 border-white">
+        <svg class="w-8 h-8 group-hover:scale-110 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
+        </svg>
+
+        <?php if (isset($_SESSION['cart']) && count($_SESSION['cart']) > 0): ?>
             <span class="absolute top-0 right-0 bg-red-500 text-white text-xs font-bold w-6 h-6 flex items-center justify-center rounded-full border-2 border-white transform translate-x-1 -translate-y-1">
                 <?= count($_SESSION['cart']) ?>
             </span>
@@ -144,48 +179,65 @@ include "config/db.php";
     </a>
 
     <script>
-    $(document).ready(function() {
-        // Logika Tombol Plus
-        $('.plus').click(function(){
-            let id = $(this).data('id');
-            let qty = parseInt($('#qty'+id).text());
-            $('#qty'+id).text(qty+1);
-        });
+        $(document).ready(function() {
+            // Logika Tombol Plus
+            $('.plus').click(function() {
+                let id = $(this).data('id');
+                let qty = parseInt($('#qty' + id).text());
+                $('#qty' + id).text(qty + 1);
+            });
 
-        // Logika Tombol Minus
-        $('.minus').click(function(){
-            let id = $(this).data('id');
-            let qty = parseInt($('#qty'+id).text());
-            if(qty > 1) $('#qty'+id).text(qty-1);
-        });
+            // Logika Tombol Minus
+            $('.minus').click(function() {
+                let id = $(this).data('id');
+                let qty = parseInt($('#qty' + id).text());
+                if (qty > 1) $('#qty' + id).text(qty - 1);
+            });
 
-        // Logika Tombol Buy (AJAX)
-        $('.buy').click(function(){
-            let btn = $(this); // Simpan referensi tombol
-            let originalText = btn.html(); // Simpan teks asli
-            let id = btn.data('id');
-            let qty = $('#qty'+id).text();
+            // Logika Tombol Buy (AJAX)
+            $('.buy').click(function() {
+                let btn = $(this); // Simpan referensi tombol
+                let originalText = btn.html(); // Simpan teks asli
+                let id = btn.data('id');
+                let qty = $('#qty' + id).text();
 
-            // Ubah tombol jadi "Loading..."
-            btn.prop('disabled', true).html('<svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>');
+                // Ubah tombol jadi "Loading..."
+                btn.prop('disabled', true).html('<svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>');
 
-            $.post("ajax/add_to_cart.php", {
-                item_id: id,
-                jumlah: qty
-            }, function(){
-                // Efek Sukses
-                btn.removeClass('bg-gray-900').addClass('bg-green-600').html('Berhasil!');
-                
-                // Kembalikan ke semula setelah 1 detik
-                setTimeout(function(){
-                    btn.prop('disabled', false).removeClass('bg-green-600').addClass('bg-gray-900').html(originalText);
-                    // Reload halaman opsional jika ingin update jumlah cart di ikon
-                    location.reload(); 
-                }, 800);
+                $.post("ajax/add_to_cart.php", {
+                    item_id: id,
+                    jumlah: qty
+                }, function() {
+                    // Efek Sukses
+                    btn.removeClass('bg-gray-900').addClass('bg-green-600').html('Berhasil!');
+
+                    // Kembalikan ke semula setelah 1 detik
+                    setTimeout(function() {
+                        btn.prop('disabled', false).removeClass('bg-green-600').addClass('bg-gray-900').html(originalText);
+                        // Reload halaman opsional jika ingin update jumlah cart di ikon
+                        location.reload();
+                    }, 800);
+                });
             });
         });
-    });
+
+        function toggleReadMore(id) {
+            var desc = document.getElementById('desc-' + id);
+            var btn = document.getElementById('btn-' + id);
+
+            // Cek apakah sedang terpotong (punya class line-clamp-1)
+            if (desc.classList.contains('line-clamp-1')) {
+                // BUKA: Hapus pemotong text
+                desc.classList.remove('line-clamp-1');
+                btn.innerHTML = "Sembunyikan"; // Ubah teks tombol
+            } else {
+                // TUTUP: Pasang lagi pemotong text
+                desc.classList.add('line-clamp-1');
+                btn.innerHTML = "Baca selengkapnya"; // Balikin teks tombol
+            }
+        }
     </script>
 
 </body>
+
 </html>

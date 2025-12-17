@@ -30,6 +30,7 @@ $result = mysqli_query($conn, $query);
     <title>Pesanan Saya - Gitar Shop</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body { font-family: 'Poppins', sans-serif; }
     </style>
@@ -38,8 +39,10 @@ $result = mysqli_query($conn, $query);
 
     <nav class="bg-white border-b border-gray-200 sticky top-0 z-50">
         <div class="container mx-auto px-4 py-4 flex justify-between items-center">
-            <a href="index.php" class="flex items-center gap-2">
-                <svg class="w-8 h-8 text-indigo-600" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/></svg>
+            <a href="index.php" class="flex items-center gap-2 group">
+                <div class="bg-indigo-600 text-white p-2 rounded-lg group-hover:bg-indigo-700 transition">
+                    <i class="fa-solid fa-guitar text-xl"></i>
+                </div>
                 <span class="text-xl font-bold tracking-tight text-gray-900">Gitar Shop</span>
             </a>
             <div class="flex items-center gap-6">

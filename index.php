@@ -14,6 +14,7 @@ include "config/db.php";
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body { font-family: 'Poppins', sans-serif; }
         /* Animasi halus untuk tombol cart */
@@ -31,7 +32,7 @@ include "config/db.php";
         <div class="container mx-auto px-4 py-3 flex justify-between items-center">
             <a href="index.php" class="flex items-center gap-2 group">
                 <div class="bg-indigo-600 text-white p-2 rounded-lg group-hover:bg-indigo-700 transition">
-                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/></svg>
+                    <i class="fa-solid fa-guitar text-xl"></i>
                 </div>
                 <span class="text-xl font-bold tracking-tight text-gray-900">Guitar Shop</span>
             </a>
@@ -56,9 +57,9 @@ include "config/db.php";
     </nav>
 
     <div class="relative bg-gray-900 text-white overflow-hidden mb-10">
-        <div class="absolute inset-0">
+        <!-- <div class="absolute inset-0">
             <img src="https://images.unsplash.com/photo-1550985543-f442fa6e0230?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80" alt="Background" class="w-full h-full object-cover opacity-30">
-        </div>
+        </div> -->
         <div class="relative container mx-auto px-4 py-20 md:py-32 text-center">
             <h1 class="text-4xl md:text-6xl font-extrabold tracking-tight mb-6 drop-shadow-2xl">
                 Mainkan Musik <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400">Impianmu</span>

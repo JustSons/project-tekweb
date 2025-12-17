@@ -1,13 +1,16 @@
 <?php 
+// Pastikan session dimulai
+// if (session_status() == PHP_SESSION_NONE) {
+//     session_start();
+// }
 include "../config/db.php"; 
 
-$error_message = ""; // Variabel untuk menampung pesan error
+$error_message = ""; 
 
 if (isset($_POST['login'])) {
     $email = $_POST['email'];
     $pass = $_POST['password'];
 
-    // Gunakan mysqli_real_escape_string untuk keamanan dasar dari SQL Injection
     $email = mysqli_real_escape_string($conn, $email);
 
     $q = mysqli_query($conn, "SELECT * FROM users WHERE email='$email'");
@@ -16,53 +19,78 @@ if (isset($_POST['login'])) {
     if ($u) {
         if (password_verify($pass, $u['password'])) {
             $_SESSION['user'] = $u;
+            
+            // Redirect sesuai Role
             if ($u['role'] == 'admin') {
                 header("Location: ../admin/index.php");
             } else {
                 header("Location: ../index.php");
             }
-            exit(); // Selalu gunakan exit setelah header redirect
+            exit(); 
         } else {
-            $error_message = "Password salah!";
+            $error_message = "Password yang Anda masukkan salah!";
         }
     } else {
-        $error_message = "Email tidak ditemukan!";
+        $error_message = "Email tidak ditemukan di sistem kami.";
     }
 }
 ?>
 
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Gitar Shop</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style> body { font-family: 'Poppins', sans-serif; } </style>
 </head>
-<body class="bg-gray-100 flex justify-center items-center h-screen">
+<body class="bg-gray-50 flex justify-center items-center min-h-screen">
 
-<form method="post" class="bg-white p-6 rounded shadow w-80">
-    <h2 class="text-xl font-bold mb-4 text-center">Login</h2>
-
-    <?php if ($error_message): ?>
-        <div class="bg-red-100 border border-red-400 text-red-700 px-3 py-2 rounded mb-4 text-sm text-center">
-            <?php echo $error_message; ?>
+    <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md border border-gray-100">
+        
+        <div class="text-center mb-8">
+            <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-indigo-100 text-indigo-600 mb-4">
+                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/></svg>
+            </div>
+            <h2 class="text-2xl font-bold text-gray-900">Selamat Datang</h2>
+            <p class="text-gray-500 text-sm">Masuk untuk melanjutkan belanja</p>
         </div>
-    <?php endif; ?>
 
-    <input name="email" type="email" placeholder="Email" required
-        class="w-full border p-2 mb-3 rounded focus:outline-blue-500">
+        <?php if ($error_message): ?>
+            <div class="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded-r text-sm flex items-center shadow-sm">
+                <svg class="w-5 h-5 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <?php echo $error_message; ?>
+            </div>
+        <?php endif; ?>
 
-    <input type="password" name="password" placeholder="Password" required
-        class="w-full border p-2 mb-3 rounded focus:outline-blue-500">
+        <form method="post" class="space-y-5">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+                <input name="email" type="email" placeholder="contoh@email.com" required
+                    class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition bg-gray-50 focus:bg-white">
+            </div>
 
-    <button name="login"
-        class="w-full bg-black text-white py-2 rounded hover:bg-gray-800 transition">
-        Login
-    </button>
+            <div>
+                <div class="flex justify-between items-center mb-1">
+                    <label class="block text-sm font-medium text-gray-700">Password</label>
+                </div>
+                <input type="password" name="password" placeholder="••••••••" required
+                    class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition bg-gray-50 focus:bg-white">
+            </div>
 
-    <p class="text-center mt-3 text-sm">
-        Belum punya akun? 
-        <a href="register.php" class="text-blue-500 hover:underline">Register</a>
-    </p>
-</form>
+            <button name="login"
+                class="w-full bg-indigo-600 text-white font-bold py-3 rounded-lg hover:bg-indigo-700 transition duration-300 shadow-lg hover:shadow-indigo-500/30">
+                Masuk Sekarang
+            </button>
+        </form>
+
+        <p class="text-center mt-8 text-sm text-gray-600">
+            Belum punya akun? 
+            <a href="register.php" class="text-indigo-600 font-bold hover:underline">Daftar sekarang</a>
+        </p>
+    </div>
 
 </body>
 </html>

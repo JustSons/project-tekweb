@@ -11,7 +11,7 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] != 'admin') {
 }
 
 $message = "";
-$status_type = ""; // Untuk menentukan warna pesan (error/success)
+$status_type = ""; 
 
 if(isset($_POST['save'])) {
     $nama = mysqli_real_escape_string($conn, $_POST['nama']);
@@ -21,9 +21,9 @@ if(isset($_POST['save'])) {
     if (!empty($_FILES['gambar']['name'])) {
         $file = $_FILES['gambar'];
         $filename = time() . "-" . basename($file['name']);
-        $filename = urlencode($filename); // Encode filename for URL
+        $filename = urlencode($filename); 
 
-        // --- LOGIKA UPLOAD SUPABASE (TIDAK DIUBAH) ---
+        // --- LOGIKA UPLOAD SUPABASE ---
         $url = "https://gbfusxshislkvgxuiwoh.supabase.co/storage/v1/object/guitars/" . $filename;
 
         $ch = curl_init($url);
@@ -50,14 +50,12 @@ if(isset($_POST['save'])) {
             if (mysqli_query($conn, $query)) {
                 $message = "Berhasil! Produk baru telah ditambahkan.";
                 $status_type = "success";
-                // Opsional: Redirect setelah sukses agar form bersih
-                // header("Location: index.php"); 
             } else {
                 $message = "Database Error: " . mysqli_error($conn);
                 $status_type = "error";
             }
         } else {
-            $message = "Upload Gagal (Supabase). Code: $http_code. Error: $curl_error.";
+            $message = "Upload Gagal (Supabase). Code: $http_code.";
             $status_type = "error";
         }
     } else {
@@ -126,15 +124,25 @@ if(isset($_POST['save'])) {
 
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-2">Foto Produk</label>
-                    <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition">
-                        <div class="flex flex-col items-center justify-center pt-5 pb-6">
-                            <i class="fa-solid fa-cloud-arrow-up text-3xl text-gray-400 mb-2"></i>
-                            <p class="mb-1 text-sm text-gray-500"><span class="font-semibold">Klik untuk upload</span> atau drag and drop</p>
-                            <p class="text-xs text-gray-500">PNG, JPG or JPEG</p>
+                    
+                    <label id="drop-zone" class="flex flex-col items-center justify-center w-full h-48 border-2 border-gray-300 border-dashed rounded-xl cursor-pointer bg-gray-50 hover:bg-gray-100 transition duration-300 relative">
+                        <div class="flex flex-col items-center justify-center pt-5 pb-6 pointer-events-none">
+                            <i class="fa-solid fa-cloud-arrow-up text-4xl text-gray-400 mb-3 transition-colors" id="upload-icon"></i>
+                            <p class="mb-1 text-sm text-gray-500"><span class="font-bold text-indigo-600">Klik untuk upload</span> atau drag and drop</p>
+                            <p class="text-xs text-gray-500">PNG, JPG or JPEG (Max 5MB)</p>
                         </div>
-                        <input type="file" name="gambar" accept="image/*" required class="hidden" onchange="previewFile(this)">
+                        <input id="file-input" type="file" name="gambar" accept="image/*" required class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onchange="previewFile(this)">
                     </label>
-                    <p id="file-name" class="mt-2 text-sm text-indigo-600 font-medium text-center"></p>
+
+                    <div id="preview-container" class="hidden relative w-full h-64 bg-gray-100 rounded-xl border border-gray-200 overflow-hidden flex items-center justify-center">
+                        <img id="image-preview" src="" alt="Preview" class="h-full object-contain">
+                        
+                        <button type="button" onclick="removeImage()" 
+                            class="absolute top-3 right-3 bg-white text-red-500 hover:text-red-700 rounded-full p-2 shadow-md hover:bg-red-50 transition transform hover:scale-110">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        </button>
+                    </div>
+
                 </div>
 
                 <button name="save" class="w-full bg-indigo-600 text-white font-bold py-3 rounded-lg hover:bg-indigo-700 transition duration-300 shadow-lg hover:shadow-indigo-500/30 flex items-center justify-center gap-2">
@@ -146,15 +154,77 @@ if(isset($_POST['save'])) {
     </div>
 
     <script>
+        const dropZone = document.getElementById('drop-zone');
+        const fileInput = document.getElementById('file-input');
+        const uploadIcon = document.getElementById('upload-icon');
+        
+        // Element Preview
+        const previewContainer = document.getElementById('preview-container');
+        const imagePreview = document.getElementById('image-preview');
+
+        // Fungsi saat file dipilih (Klik atau Drop)
         function previewFile(input) {
-            const fileNameElement = document.getElementById('file-name');
-            if (input.files && input.files[0]) {
-                fileNameElement.textContent = "File terpilih: " + input.files[0].name;
-                fileNameElement.classList.remove('hidden');
-            } else {
-                fileNameElement.textContent = "";
+            const file = input.files[0];
+            if (file) {
+                const reader = new FileReader();
+
+                // Saat file selesai dibaca
+                reader.onload = function(e) {
+                    // Set sumber gambar
+                    imagePreview.src = e.target.result;
+                    
+                    // Sembunyikan Box Upload -> Tampilkan Preview
+                    dropZone.classList.add('hidden');
+                    previewContainer.classList.remove('hidden');
+                }
+
+                reader.readAsDataURL(file); // Baca file sebagai URL data
             }
         }
+
+        // Fungsi Tombol X (Hapus Gambar)
+        function removeImage() {
+            // Reset input file
+            fileInput.value = '';
+            imagePreview.src = '';
+
+            // Tampilkan Box Upload -> Sembunyikan Preview
+            dropZone.classList.remove('hidden');
+            previewContainer.classList.add('hidden');
+        }
+
+        // --- DRAG AND DROP VISUAL EFFECTS ---
+
+        // Saat file masuk area
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('border-indigo-500', 'bg-indigo-50');
+            dropZone.classList.remove('border-gray-300', 'bg-gray-50');
+            uploadIcon.classList.add('text-indigo-500');
+        });
+
+        // Saat file keluar area
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('border-indigo-500', 'bg-indigo-50');
+            dropZone.classList.add('border-gray-300', 'bg-gray-50');
+            uploadIcon.classList.remove('text-indigo-500');
+        });
+
+        // Saat file dilepas (Drop)
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            
+            // Kembalikan style
+            dropZone.classList.remove('border-indigo-500', 'bg-indigo-50');
+            dropZone.classList.add('border-gray-300', 'bg-gray-50');
+            uploadIcon.classList.remove('text-indigo-500');
+
+            // Masukkan file ke input
+            if (e.dataTransfer.files.length) {
+                fileInput.files = e.dataTransfer.files;
+                previewFile(fileInput); // Panggil fungsi preview
+            }
+        });
     </script>
 
 </body>

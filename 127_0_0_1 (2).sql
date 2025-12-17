@@ -91,7 +91,15 @@ CREATE TABLE `users` (
 
 INSERT INTO `users` (`id`, `nama`, `email`, `password`, `no_telp`, `role`) VALUES
 (4, 'Admin', 'admin@gitarshop.com', '$2y$10$3V2H6kgItSB7aTRyKdvSBuyUQlZEwPJm0khFGPWbmwijlZXjLliXK', '081234567890', 'admin');
-
+INSERT INTO `users` (`nama`, `email`, `password`, `no_telp`, `role`) 
+VALUES 
+(
+    'User Biasa', 
+    'user@gmail.com', 
+    '$2y$10$3V2H6kgItSB7aTRyKdvSBuyUQlZEwPJm0khFGPWbmwijlZXjLliXK', 
+    '081222333444', 
+    'user'
+);
 --
 -- Indexes for dumped tables
 --

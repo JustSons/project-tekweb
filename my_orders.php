@@ -11,21 +11,26 @@ if (!isset($_SESSION['user'])) {
 $user_name = isset($_SESSION['user']['nama']) ? $_SESSION['user']['nama'] : '';
 $user_id = isset($_SESSION['user']['id']) ? (int)$_SESSION['user']['id'] : null;
 
-// Cek apakah tabel buy punya kolom user_id. Jika ada, pakai user_id untuk query.
-$col = mysqli_query($conn, "SHOW COLUMNS FROM buy LIKE 'user_id'");
-$has_user_id = ($col && mysqli_num_rows($col) > 0);
+// Cek apakah tabel buy punya kolom user_id dan item_id
+$col_user = mysqli_query($conn, "SHOW COLUMNS FROM buy LIKE 'user_id'");
+$has_user_id = ($col_user && mysqli_num_rows($col_user) > 0);
+$col_item = mysqli_query($conn, "SHOW COLUMNS FROM buy LIKE 'item_id'");
+$has_item_id = ($col_item && mysqli_num_rows($col_item) > 0);
+
+// Tentukan kondisi JOIN dan WHERE sesuai kolom yang ada
+$join_condition = $has_item_id ? 'ON buy.item_id = items.id' : 'ON buy.nama_item = items.nama_item';
 
 if ($has_user_id && $user_id) {
     $query = "SELECT buy.*, items.gambar 
               FROM buy 
-              LEFT JOIN items ON buy.nama_item = items.nama_item 
+              LEFT JOIN items $join_condition 
               WHERE buy.user_id = $user_id 
               ORDER BY buy.id DESC";
 } else {
     $safe_name = mysqli_real_escape_string($conn, $user_name);
     $query = "SELECT buy.*, items.gambar 
               FROM buy 
-              LEFT JOIN items ON buy.nama_item = items.nama_item 
+              LEFT JOIN items $join_condition 
               WHERE buy.nama_user = '$safe_name' 
               ORDER BY buy.id DESC";
 }

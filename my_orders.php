@@ -8,16 +8,27 @@ if (!isset($_SESSION['user'])) {
     exit();
 }
 
-$user_name = $_SESSION['user']['nama'];
-$safe_name = mysqli_real_escape_string($conn, $user_name);
+$user_name = isset($_SESSION['user']['nama']) ? $_SESSION['user']['nama'] : '';
+$user_id = isset($_SESSION['user']['id']) ? (int)$_SESSION['user']['id'] : null;
 
-// 2. Query yang diperbarui (JOIN dengan tabel items untuk ambil Gambar)
-// Kita mencocokkan nama_item di tabel buy dengan tabel items
-$query = "SELECT buy.*, items.gambar 
-          FROM buy 
-          LEFT JOIN items ON buy.nama_item = items.nama_item 
-          WHERE buy.nama_user = '$safe_name' 
-          ORDER BY buy.id DESC";
+// Cek apakah tabel buy punya kolom user_id. Jika ada, pakai user_id untuk query.
+$col = mysqli_query($conn, "SHOW COLUMNS FROM buy LIKE 'user_id'");
+$has_user_id = ($col && mysqli_num_rows($col) > 0);
+
+if ($has_user_id && $user_id) {
+    $query = "SELECT buy.*, items.gambar 
+              FROM buy 
+              LEFT JOIN items ON buy.nama_item = items.nama_item 
+              WHERE buy.user_id = $user_id 
+              ORDER BY buy.id DESC";
+} else {
+    $safe_name = mysqli_real_escape_string($conn, $user_name);
+    $query = "SELECT buy.*, items.gambar 
+              FROM buy 
+              LEFT JOIN items ON buy.nama_item = items.nama_item 
+              WHERE buy.nama_user = '$safe_name' 
+              ORDER BY buy.id DESC";
+}
 
 $result = mysqli_query($conn, $query);
 ?>

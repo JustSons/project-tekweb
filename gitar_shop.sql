@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 16, 2025 at 01:27 PM
+-- Generation Time: Dec 17, 2025 at 06:25 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -20,8 +20,6 @@ SET time_zone = "+00:00";
 --
 -- Database: `gitar_shop`
 --
-CREATE DATABASE IF NOT EXISTS `gitar_shop` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-USE `gitar_shop`;
 
 -- --------------------------------------------------------
 
@@ -31,6 +29,7 @@ USE `gitar_shop`;
 
 CREATE TABLE `buy` (
   `id` int(11) NOT NULL,
+  `user_id` int(11) DEFAULT NULL,
   `nama_user` varchar(100) DEFAULT NULL,
   `nama_item` varchar(100) DEFAULT NULL,
   `jumlah` int(11) DEFAULT NULL,
@@ -44,8 +43,14 @@ CREATE TABLE `buy` (
 -- Dumping data for table `buy`
 --
 
-INSERT INTO `buy` (`id`, `nama_user`, `nama_item`, `jumlah`, `total`, `status`, `alamat`, `telp_penerima`) VALUES
-(2, 'dsad', 'dsadsad', 4, 92, 'SENT', 'dsadsa', '3213213');
+INSERT INTO `buy` (`id`, `user_id`, `nama_user`, `nama_item`, `jumlah`, `total`, `status`, `alamat`, `telp_penerima`) VALUES
+(2, NULL, 'dsad', 'dsadsad', 4, 92, 'SENT', 'dsadsa', '3213213'),
+(3, 5, 'Dav', 'dsad', 11, 253, 'SENT', 'Dadadadadadad', '08546456456'),
+(4, 5, 'Dav', 'GitHub', 3, 36, 'SENT', 'Dadadadadadad', '08546456456'),
+(5, 5, 'Dav', 'dsad', 3, 69, 'SENT', 'Asadasdas', '08546456456'),
+(6, 6, 'Dav', 'dsad', 2, 46, 'PENDING', 'testes2w', '435534535435'),
+(7, 6, 'Dav', 'GitHub', 3, 36, 'SENT', 'testes2w', '435534535435'),
+(8, 6, 'Dav', 'dsadsad', 2, 46, 'SENT', 'testes2w', '435534535435');
 
 -- --------------------------------------------------------
 
@@ -90,16 +95,12 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `nama`, `email`, `password`, `no_telp`, `role`) VALUES
-(4, 'Admin', 'admin@gitarshop.com', '$2y$10$3V2H6kgItSB7aTRyKdvSBuyUQlZEwPJm0khFGPWbmwijlZXjLliXK', '081234567890', 'admin');
-INSERT INTO `users` (`nama`, `email`, `password`, `no_telp`, `role`) 
-VALUES 
-(
-    'User Biasa', 
-    'user@gmail.com', 
-    '$2y$10$3V2H6kgItSB7aTRyKdvSBuyUQlZEwPJm0khFGPWbmwijlZXjLliXK', 
-    '081222333444', 
-    'user'
-);
+(4, 'Admin', 'admin@gitarshop.com', '$2y$10$3V2H6kgItSB7aTRyKdvSBuyUQlZEwPJm0khFGPWbmwijlZXjLliXK', '081234567890', 'admin'),
+(5, 'Dav', 'c14240020@john.petra.ac.id', '$2y$10$gWrXkVmF6kPkrNHKN0s35OArpLiNrUyaTh7j7FrJl.JP0sd.aM8M.', '08546456456', 'user'),
+(6, 'Dav', 'wnest@gitarshop.com', '$2y$10$OOXFk.OPBLfAVGqIP7DWqe/BUvlQR.SLP8Joy4iWStGcM.Ibo.EQe', 'sadasfda', 'user'),
+(7, 'budi', 'asdasdsad@gmail.com', '$2y$10$3UQoy4jQZelX.kt3neYFI.sw2QnvT88pGdEKLxxHcViZKBzWVVq96', 'sadasfda', 'user'),
+(8, 'Dav', 'oaskdoksadokad@gmail.com', '$2y$10$lFkBRUgOlmgQPpECYFYT1OZ5.B/H/7y2Qx2qKnMv.2KFckGwmKXxK', '12335425435', 'user');
+
 --
 -- Indexes for dumped tables
 --
@@ -108,7 +109,8 @@ VALUES
 -- Indexes for table `buy`
 --
 ALTER TABLE `buy`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `fk_buy_user` (`user_id`);
 
 --
 -- Indexes for table `items`
@@ -131,7 +133,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `buy`
 --
 ALTER TABLE `buy`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `items`
@@ -143,7 +145,17 @@ ALTER TABLE `items`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+
+--
+-- Constraints for dumped tables
+--
+
+--
+-- Constraints for table `buy`
+--
+ALTER TABLE `buy`
+  ADD CONSTRAINT `fk_buy_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

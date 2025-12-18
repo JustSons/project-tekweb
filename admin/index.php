@@ -158,7 +158,7 @@ $total_revenue = $row_revenue['total'] ?? 0;
                                         </a>
                                         <a href="delete_item.php?id=<?= $item['id'] ?>" 
                                            class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-red-100 text-red-600 hover:bg-red-600 hover:text-white transition"
-                                           onclick="return confirm('Yakin ingin menghapus item ini secara permanen?')" title="Hapus Item">
+                                           onclick="openDeleteItemModal(<?= $item['id'] ?>, '<?= htmlspecialchars($item['nama_item']) ?>'); return false;" title="Hapus Item">
                                             <i class="fa-solid fa-trash"></i>
                                         </a>
                                     </div>
@@ -247,7 +247,7 @@ $total_revenue = $row_revenue['total'] ?? 0;
         </div>
     </div>
 
-    <!-- Modal Konfirmasi Hapus -->
+    <!-- Modal Konfirmasi Hapus Order -->
     <div id="deleteModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
         <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
             <div class="mt-3 text-center">
@@ -266,6 +266,32 @@ $total_revenue = $row_revenue['total'] ?? 0;
                         Batal
                     </button>
                     <button id="confirmDelete" class="px-4 py-2 bg-red-600 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-300">
+                        Hapus
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Konfirmasi Hapus Item -->
+    <div id="deleteItemModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+            <div class="mt-3 text-center">
+                <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100">
+                    <i class="fa-solid fa-exclamation-triangle text-red-600 text-xl"></i>
+                </div>
+                <h3 class="text-lg leading-6 font-medium text-gray-900 mt-4">Konfirmasi Hapus Item</h3>
+                <div class="mt-2 px-7 py-3">
+                    <p class="text-sm text-gray-500">
+                        Apakah Anda yakin ingin menghapus produk <strong id="deleteItemNameModal"></strong> secara permanen? 
+                        Tindakan ini tidak dapat dibatalkan.
+                    </p>
+                </div>
+                <div class="flex items-center px-4 py-3">
+                    <button id="cancelDeleteItem" class="px-4 py-2 bg-gray-300 text-gray-900 text-base font-medium rounded-md w-full shadow-sm hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 mr-3">
+                        Batal
+                    </button>
+                    <button id="confirmDeleteItem" class="px-4 py-2 bg-red-600 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-300">
                         Hapus
                     </button>
                 </div>
@@ -299,6 +325,35 @@ $total_revenue = $row_revenue['total'] ?? 0;
         document.getElementById('deleteModal').addEventListener('click', function(e) {
             if (e.target === this) {
                 closeDeleteModal();
+            }
+        });
+
+        // Script untuk modal hapus item
+        let deleteItemId = null;
+
+        function openDeleteItemModal(id, itemName) {
+            deleteItemId = id;
+            document.getElementById('deleteItemNameModal').textContent = itemName;
+            document.getElementById('deleteItemModal').classList.remove('hidden');
+        }
+
+        function closeDeleteItemModal() {
+            document.getElementById('deleteItemModal').classList.add('hidden');
+            deleteItemId = null;
+        }
+
+        document.getElementById('cancelDeleteItem').addEventListener('click', closeDeleteItemModal);
+
+        document.getElementById('confirmDeleteItem').addEventListener('click', function() {
+            if (deleteItemId) {
+                window.location.href = 'delete_item.php?id=' + deleteItemId;
+            }
+        });
+
+        // Tutup modal item jika klik di luar modal
+        document.getElementById('deleteItemModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeDeleteItemModal();
             }
         });
     </script>

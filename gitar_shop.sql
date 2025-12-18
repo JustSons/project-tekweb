@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 17, 2025 at 07:19 PM
+-- Generation Time: Dec 18, 2025 at 03:50 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -20,6 +20,8 @@ SET time_zone = "+00:00";
 --
 -- Database: `gitar_shop`
 --
+CREATE DATABASE IF NOT EXISTS `gitar_shop` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+USE `gitar_shop`;
 
 -- --------------------------------------------------------
 
@@ -45,10 +47,9 @@ CREATE TABLE `buy` (
 --
 
 INSERT INTO `buy` (`id`, `item_id`, `user_id`, `nama_user`, `nama_item`, `jumlah`, `total`, `status`, `alamat`, `telp_penerima`) VALUES
-(9, 4, 9, 'Dav', 'Budiman', 1, 10000, 'PENDING', 'Jalan Kebenaran', '08546456456'),
-(10, 5, 9, 'Dav', 'Budiwoman', 1, 15000, 'SENT', 'Jalan Kebenaran', '08546456456'),
-(11, 6, 9, 'Dav', 'Budiman', 1, 100000, 'SENT', 'asdasd', '08546456456'),
-(12, 4, 9, 'Dav', 'Budiman', 1, 10000, 'PENDING', 'sadasd', '08546456456');
+(13, 7, 11, 'User', 'Ukulele', 1, 1000000, 'SENT', 'Jl. Ince Nurdin', '291321'),
+(14, 8, 11, 'User', 'Gitar Klasik', 4, 2760000, 'SENT', 'Jl. Ince Nurdin', '291321'),
+(15, 8, 11, 'User', 'Gitar Klasik', 1, 690000, 'PENDING', 'Jl. Sawerigading', '3213213');
 
 -- --------------------------------------------------------
 
@@ -69,9 +70,10 @@ CREATE TABLE `items` (
 --
 
 INSERT INTO `items` (`id`, `nama_item`, `harga`, `deskripsi`, `gambar`) VALUES
-(4, 'Budiman', 10000, 'Gitar 100 string', 'https://gbfusxshislkvgxuiwoh.supabase.co/storage/v1/object/public/guitars/1765994915-Screenshot+2025-08-06+192736.png'),
-(5, 'Budiwoman', 15000, 'Gitar 1000 string', 'https://gbfusxshislkvgxuiwoh.supabase.co/storage/v1/object/public/guitars/1765995037-Screenshot+2025-10-18+185019.png'),
-(6, 'Budiman', 100000, 'Gitar 1 juta string', 'https://gbfusxshislkvgxuiwoh.supabase.co/storage/v1/object/public/guitars/1765995156-Screenshot+2025-08-21+204443.png');
+(7, 'Ukulele', 1000000, 'Ukulele yang hebat', 'https://gbfusxshislkvgxuiwoh.supabase.co/storage/v1/object/public/guitars/1766025533-preview_1.jpg'),
+(9, 'Gitar Elektrik', 4200000, 'Make your style electrifying', 'https://gbfusxshislkvgxuiwoh.supabase.co/storage/v1/object/public/guitars/1766025594-images+%283%29.jpg'),
+(10, 'Gitar Akustik', 900000, 'Not Really Autistic', 'https://gbfusxshislkvgxuiwoh.supabase.co/storage/v1/object/public/guitars/1766025611-images+%284%29.jpg'),
+(11, 'Gitar Klasik', 690000, 'Klasik Atau Rank', 'https://gbfusxshislkvgxuiwoh.supabase.co/storage/v1/object/public/guitars/1766026007-images+%282%29.jpg');
 
 -- --------------------------------------------------------
 
@@ -94,8 +96,7 @@ CREATE TABLE `users` (
 
 INSERT INTO `users` (`id`, `nama`, `email`, `password`, `no_telp`, `role`) VALUES
 (4, 'Admin', 'admin@gitarshop.com', '$2y$10$3V2H6kgItSB7aTRyKdvSBuyUQlZEwPJm0khFGPWbmwijlZXjLliXK', '081234567890', 'admin'),
-(9, 'Dav', 'wnest@gitarshop.com', '$2y$10$x4L.ZfePFCoH1AdNwCEnhO4UhCckrtAY07fNrCY9o4/4xtvwMvfHe', '08546456456', 'user'),
-(10, 'Dav', 'c14240020@john.petra.ac.id', '$2y$10$Ipx/FzjpCjvX1sDlf07.n.AIq5SVmIZ76pNaxFKdUJAx0XdVteDj2', '08546456456', 'user');
+(11, 'User', 'user@gmail.com', '$2y$10$1dqfVhLG.L3WZUGTG/E/GeQ6lVTe2avHeiFu78YAtJthjxYNiVURy', '12345', 'user');
 
 --
 -- Indexes for dumped tables
@@ -129,19 +130,19 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `buy`
 --
 ALTER TABLE `buy`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- AUTO_INCREMENT for table `items`
 --
 ALTER TABLE `items`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- Constraints for dumped tables

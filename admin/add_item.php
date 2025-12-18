@@ -23,7 +23,7 @@ if(isset($_POST['save'])) {
         $filename = time() . "-" . basename($file['name']);
         $filename = urlencode($filename); 
 
-        // --- LOGIKA UPLOAD SUPABASE ---
+        // --- UPLOAD SUPABASE ---
         $url = "https://gbfusxshislkvgxuiwoh.supabase.co/storage/v1/object/guitars/" . $filename;
 
         $ch = curl_init($url);

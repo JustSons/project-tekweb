@@ -168,12 +168,12 @@ if(isset($_POST['save'])) {
             if (file) {
                 const reader = new FileReader();
 
-                // Saat file selesai dibaca
+                
                 reader.onload = function(e) {
                     // Set sumber gambar
                     imagePreview.src = e.target.result;
                     
-                    // Sembunyikan Box Upload -> Tampilkan Preview
+                    
                     dropZone.classList.add('hidden');
                     previewContainer.classList.remove('hidden');
                 }
@@ -184,7 +184,6 @@ if(isset($_POST['save'])) {
 
         // Fungsi Tombol X (Hapus Gambar)
         function removeImage() {
-            // Reset input file
             fileInput.value = '';
             imagePreview.src = '';
 
@@ -193,7 +192,7 @@ if(isset($_POST['save'])) {
             previewContainer.classList.add('hidden');
         }
 
-        // --- DRAG AND DROP VISUAL EFFECTS ---
+        //  DRAG AND DROP VISUAL EFFECTS 
 
         // Saat file masuk area
         dropZone.addEventListener('dragover', (e) => {
@@ -214,7 +213,7 @@ if(isset($_POST['save'])) {
         dropZone.addEventListener('drop', (e) => {
             e.preventDefault();
             
-            // Kembalikan style
+            
             dropZone.classList.remove('border-indigo-500', 'bg-indigo-50');
             dropZone.classList.add('border-gray-300', 'bg-gray-50');
             uploadIcon.classList.remove('text-indigo-500');
@@ -222,7 +221,7 @@ if(isset($_POST['save'])) {
             // Masukkan file ke input
             if (e.dataTransfer.files.length) {
                 fileInput.files = e.dataTransfer.files;
-                previewFile(fileInput); // Panggil fungsi preview
+                previewFile(fileInput); 
             }
         });
     </script>

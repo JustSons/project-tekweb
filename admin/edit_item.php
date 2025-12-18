@@ -35,7 +35,7 @@ if(isset($_POST['update'])) {
         $filename = time() . "-" . basename($file['name']);
         $filename = urlencode($filename); 
 
-        // --- LOGIKA UPLOAD SUPABASE ---
+        // LOGIKA UPLOAD SUPABASE 
         $url = "https://gbfusxshislkvgxuiwoh.supabase.co/storage/v1/object/guitars/" . $filename;
 
         $ch = curl_init($url);
@@ -65,7 +65,6 @@ if(isset($_POST['update'])) {
 
     $query = "UPDATE items SET nama_item='$nama', harga='$harga', deskripsi='$desc', gambar='$img_url' WHERE id=$id";
     if (mysqli_query($conn, $query)) {
-        // Set pesan sukses di session
         $_SESSION['message'] = "Berhasil! Produk telah diperbarui.";
         $_SESSION['message_type'] = "success";
         header("Location: index.php");

@@ -75,17 +75,16 @@ $cart = $_SESSION['cart'] ?? [];
                                     <th class="p-4">Produk</th>
                                     <th class="p-4 text-center">Jumlah</th>
                                     <th class="p-4 text-right">Total</th>
-                                    <th class="p-4 text-center">Aksi</th>
-                                </tr>
+                                    </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-100">
                                 <?php
                                 $grandTotal = 0;
-                                foreach ($cart as $key => $item) { //$key untuk index array
+                                foreach ($cart as $key => $item) { 
                                     $total = $item['harga'] * $item['qty'];
                                     $grandTotal += $total;
 
-                                    // Pastikan ID ada, kalau tidak pakai $key sebagai fallback (untuk hapus)
+                                    // Fallback ID agar tidak error
                                     $id_hapus = isset($item['id']) ? $item['id'] : $key;
                                 ?>
                                     <tr>
@@ -93,37 +92,32 @@ $cart = $_SESSION['cart'] ?? [];
                                             <div class="font-bold text-gray-800 text-lg"><?= htmlspecialchars($item['nama']) ?></div>
                                             <div class="text-sm text-gray-500">@ Rp <?= number_format($item['harga'], 0, ',', '.') ?></div>
                                         </td>
+                                        
                                         <td class="p-4 text-center">
                                             <div class="flex items-center justify-center gap-3">
 
                                                 <a href="update_cart.php?id=<?= $id_hapus ?>&action=minus"
-                                                    class="w-8 h-8 flex items-center justify-center bg-gray-200 text-gray-600 rounded-full hover:bg-indigo-600 hover:text-white transition font-bold shadow-sm">
+                                                    class="w-8 h-8 flex items-center justify-center bg-gray-200 text-gray-600 rounded-full hover:bg-red-500 hover:text-white transition font-bold shadow-sm"
+                                                    title="Kurangi (Hapus jika 0)">
                                                     −
                                                 </a>
 
                                                 <span class="font-mono font-bold text-gray-800 text-lg w-8"><?= $item['qty'] ?></span>
 
                                                 <a href="update_cart.php?id=<?= $id_hapus ?>&action=plus"
-                                                    class="w-8 h-8 flex items-center justify-center bg-gray-200 text-gray-600 rounded-full hover:bg-indigo-600 hover:text-white transition font-bold shadow-sm">
+                                                    class="w-8 h-8 flex items-center justify-center bg-gray-200 text-gray-600 rounded-full hover:bg-indigo-600 hover:text-white transition font-bold shadow-sm"
+                                                    title="Tambah">
                                                     +
                                                 </a>
 
                                             </div>
                                         </td>
+
                                         <td class="p-4 text-right font-bold text-indigo-600">
                                             Rp <?= number_format($total, 0, ',', '.') ?>
                                         </td>
-
-                                        <td class="p-4 text-center">
-                                            <a href="delete_cart.php?id=<?= $id_hapus ?>"
-                                                onclick="return confirm('Yakin ingin menghapus barang ini dari keranjang?')"
-                                                class="w-8 h-8 inline-flex items-center justify-center rounded-full bg-red-50 text-red-500 hover:bg-red-100 hover:text-red-600 transition"
-                                                title="Hapus Item">
-                                                <i class="fa-solid fa-trash"></i>
-                                            </a>
-                                        </td>
-
-                                    </tr>
+                                        
+                                        </tr>
                                 <?php } ?>
                             </tbody>
                         </table>
@@ -169,12 +163,9 @@ $cart = $_SESSION['cart'] ?? [];
     </div>
 
     <div id="confirmationModal" class="fixed inset-0 z-50 hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-
         <div class="fixed inset-0 bg-gray-900 bg-opacity-75 transition-opacity backdrop-blur-sm"></div>
-
         <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
             <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
-
                 <div class="relative transform overflow-hidden rounded-2xl bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg border border-gray-200">
                     <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
                         <div class="sm:flex sm:items-start">
@@ -210,26 +201,19 @@ $cart = $_SESSION['cart'] ?? [];
     </div>
 
     <script>
-        // Fungsi ini dipanggil saat form disubmit (tombol Checkout diklik)
         function confirmCheckout(event) {
-            // Mencegah form dikirim langsung
             event.preventDefault();
-
-            // Tampilkan Modal (Hapus class hidden)
             document.getElementById('confirmationModal').classList.remove('hidden');
         }
 
-        // Fungsi untuk menutup modal
         function closeModal() {
             document.getElementById('confirmationModal').classList.add('hidden');
         }
 
-        // Fungsi jika user yakin (submit form secara manual)
         function submitRealForm() {
             document.getElementById('checkoutForm').submit();
         }
     </script>
 
 </body>
-
 </html>

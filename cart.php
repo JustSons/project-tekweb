@@ -17,6 +17,7 @@ $cart = $_SESSION['cart'] ?? [];
 
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -24,8 +25,13 @@ $cart = $_SESSION['cart'] ?? [];
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style> body { font-family: 'Poppins', sans-serif; } </style>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+    </style>
 </head>
+
 <body class="bg-gray-50 text-gray-800">
 
     <nav class="bg-white border-b border-gray-200 sticky top-0 z-40">
@@ -56,7 +62,7 @@ $cart = $_SESSION['cart'] ?? [];
         <?php } ?>
 
         <div class="flex flex-col lg:flex-row gap-8">
-            
+
             <div class="flex-1">
                 <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
                     Item yang dipilih <span class="bg-gray-200 text-gray-600 text-xs px-2 py-1 rounded-full"><?= count($cart) ?></span>
@@ -69,27 +75,55 @@ $cart = $_SESSION['cart'] ?? [];
                                     <th class="p-4">Produk</th>
                                     <th class="p-4 text-center">Jumlah</th>
                                     <th class="p-4 text-right">Total</th>
+                                    <th class="p-4 text-center">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-100">
                                 <?php
                                 $grandTotal = 0;
-                                foreach ($cart as $item) {
+                                foreach ($cart as $key => $item) { //$key untuk index array
                                     $total = $item['harga'] * $item['qty'];
                                     $grandTotal += $total;
+
+                                    // Pastikan ID ada, kalau tidak pakai $key sebagai fallback (untuk hapus)
+                                    $id_hapus = isset($item['id']) ? $item['id'] : $key;
                                 ?>
-                                <tr>
-                                    <td class="p-4">
-                                        <div class="font-bold text-gray-800 text-lg"><?= htmlspecialchars($item['nama']) ?></div>
-                                        <div class="text-sm text-gray-500">@ Rp <?= number_format($item['harga'], 0, ',', '.') ?></div>
-                                    </td>
-                                    <td class="p-4 text-center">
-                                        <span class="inline-block bg-gray-100 px-3 py-1 rounded font-mono font-bold text-gray-700">x<?= $item['qty'] ?></span>
-                                    </td>
-                                    <td class="p-4 text-right font-bold text-indigo-600">
-                                        Rp <?= number_format($total, 0, ',', '.') ?>
-                                    </td>
-                                </tr>
+                                    <tr>
+                                        <td class="p-4">
+                                            <div class="font-bold text-gray-800 text-lg"><?= htmlspecialchars($item['nama']) ?></div>
+                                            <div class="text-sm text-gray-500">@ Rp <?= number_format($item['harga'], 0, ',', '.') ?></div>
+                                        </td>
+                                        <td class="p-4 text-center">
+                                            <div class="flex items-center justify-center gap-3">
+
+                                                <a href="update_cart.php?id=<?= $id_hapus ?>&action=minus"
+                                                    class="w-8 h-8 flex items-center justify-center bg-gray-200 text-gray-600 rounded-full hover:bg-indigo-600 hover:text-white transition font-bold shadow-sm">
+                                                    −
+                                                </a>
+
+                                                <span class="font-mono font-bold text-gray-800 text-lg w-8"><?= $item['qty'] ?></span>
+
+                                                <a href="update_cart.php?id=<?= $id_hapus ?>&action=plus"
+                                                    class="w-8 h-8 flex items-center justify-center bg-gray-200 text-gray-600 rounded-full hover:bg-indigo-600 hover:text-white transition font-bold shadow-sm">
+                                                    +
+                                                </a>
+
+                                            </div>
+                                        </td>
+                                        <td class="p-4 text-right font-bold text-indigo-600">
+                                            Rp <?= number_format($total, 0, ',', '.') ?>
+                                        </td>
+
+                                        <td class="p-4 text-center">
+                                            <a href="delete_cart.php?id=<?= $id_hapus ?>"
+                                                onclick="return confirm('Yakin ingin menghapus barang ini dari keranjang?')"
+                                                class="w-8 h-8 inline-flex items-center justify-center rounded-full bg-red-50 text-red-500 hover:bg-red-100 hover:text-red-600 transition"
+                                                title="Hapus Item">
+                                                <i class="fa-solid fa-trash"></i>
+                                            </a>
+                                        </td>
+
+                                    </tr>
                                 <?php } ?>
                             </tbody>
                         </table>
@@ -100,9 +134,9 @@ $cart = $_SESSION['cart'] ?? [];
             <div class="lg:w-96">
                 <div class="bg-white rounded-xl shadow-lg border border-gray-100 p-6 sticky top-24">
                     <h3 class="text-lg font-bold mb-4 border-b pb-2">Rincian Pengiriman</h3>
-                    
+
                     <form id="checkoutForm" method="post" action="make_order.php" class="space-y-4" onsubmit="confirmCheckout(event)">
-                        
+
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Alamat Lengkap</label>
                             <textarea name="alamat" required rows="3"
@@ -135,12 +169,12 @@ $cart = $_SESSION['cart'] ?? [];
     </div>
 
     <div id="confirmationModal" class="fixed inset-0 z-50 hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-        
+
         <div class="fixed inset-0 bg-gray-900 bg-opacity-75 transition-opacity backdrop-blur-sm"></div>
 
         <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
             <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
-                
+
                 <div class="relative transform overflow-hidden rounded-2xl bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg border border-gray-200">
                     <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
                         <div class="sm:flex sm:items-start">
@@ -161,11 +195,11 @@ $cart = $_SESSION['cart'] ?? [];
                         </div>
                     </div>
                     <div class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
-                        <button type="button" onclick="submitRealForm()" 
+                        <button type="button" onclick="submitRealForm()"
                             class="inline-flex w-full justify-center rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 sm:ml-3 sm:w-auto transition">
                             Ya, Data Benar
                         </button>
-                        <button type="button" onclick="closeModal()" 
+                        <button type="button" onclick="closeModal()"
                             class="mt-3 inline-flex w-full justify-center rounded-lg bg-white px-5 py-2.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto transition">
                             Cek Lagi
                         </button>
@@ -179,8 +213,8 @@ $cart = $_SESSION['cart'] ?? [];
         // Fungsi ini dipanggil saat form disubmit (tombol Checkout diklik)
         function confirmCheckout(event) {
             // Mencegah form dikirim langsung
-            event.preventDefault(); 
-            
+            event.preventDefault();
+
             // Tampilkan Modal (Hapus class hidden)
             document.getElementById('confirmationModal').classList.remove('hidden');
         }
@@ -197,4 +231,5 @@ $cart = $_SESSION['cart'] ?? [];
     </script>
 
 </body>
+
 </html>

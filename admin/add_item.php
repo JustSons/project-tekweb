@@ -158,7 +158,7 @@ if(isset($_POST['save'])) {
         const fileInput = document.getElementById('file-input');
         const uploadIcon = document.getElementById('upload-icon');
         
-        // Element Preview
+        
         const previewContainer = document.getElementById('preview-container');
         const imagePreview = document.getElementById('image-preview');
 
